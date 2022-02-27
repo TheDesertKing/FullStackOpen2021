@@ -4,13 +4,10 @@ const Part = ({ partName, exercisesCount }) => {
 }
 const Content = ({ partArray }) => {
   let ret = []
-  // partArray.forEach(part => {
-  //   ret.push(<Part partName={part.name} exercisesCount={part.exercises} />)
-  // });
   for (let i = 0; i < partArray.length; i++) {
     ret.push(<Part key={i} partName={partArray[i].name} exercisesCount={partArray[i].exercises} />)
   }
-  return ret
+  return <>{ret}</>
 }
 const Total = ({ partArray }) => {
   // for readability
