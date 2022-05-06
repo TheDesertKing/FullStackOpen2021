@@ -6,39 +6,50 @@ const handlersFactory = (
   personsArray,
   setPersonsArray,
   newPersonName,
-  setNewName,
+  setNewPersonName,
   newPersonNum,
-  setNewNum,
+  setNewPersonNum,
   serverService,
   setFilter
 ) => {
+  const updatePersonsArray = (newPersonsArray) => {
+    setPersonsArray(newPersonsArray);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (
-      Object.values(personsArray)
-        .map((person) => person.name)
-        .includes(newPersonName)
-    ) {
-      alert(`${newPersonName} is already added to phonebook`);
-    } else if (newPersonName === "" || newPersonNum === "") {
+
+    if (newPersonName === "" || newPersonNum === "") {
       alert("Both fields need values");
+    } else if (personsArray.some((person) => person.name === newPersonName)) {
+      if (
+        window.confirm(
+          `${newPersonName} is already added to the phonebook, \ndo you want to change their number?`
+        )
+      ) {
+        // const personToUpdate = { name: newPersonName, number: newPersonNum,id: id };
+        const personToUpdate = personsArray.filter(
+          (person) => person.name === newPersonName
+        )[0];
+        serverService
+          .updatePerson(personToUpdate, newPersonNum)
+          .then((newPersonsArray) => updatePersonsArray(newPersonsArray));
+      }
     } else {
       const newPerson = { name: newPersonName, number: newPersonNum };
       serverService
         .createPerson(newPerson)
-        .then(() =>
-          serverService.getPersons().then((data) => setPersonsArray(data))
-        );
-      setNewName("");
-      setNewNum("");
+        .then((newPersonsArray) => updatePersonsArray(newPersonsArray));
+      setNewPersonName("");
+      setNewPersonNum("");
     }
   };
 
   const handleNameChange = (e) => {
-    setNewName(e.target.value);
+    setNewPersonName(e.target.value);
   };
   const handleNumChange = (e) => {
-    setNewNum(e.target.value);
+    setNewPersonNum(e.target.value);
   };
   const handleFilterChange = (e) => {
     setFilter(e.target.value);
