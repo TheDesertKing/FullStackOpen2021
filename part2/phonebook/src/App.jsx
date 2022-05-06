@@ -1,70 +1,60 @@
-import { useEffect, useState } from 'react'
-import axios from 'axios'
-
-const Filter = ({ val, changeHandler }) => <input value={val} onChange={changeHandler} />
-const Form = ({ name, number, nameHandler, numberHandler, submitHandler }) => {
-  return (
-    <form onSubmit={submitHandler}>
-      <div>
-        name: <input value={name} onChange={nameHandler} /> <br />
-        number: <input value={number} onChange={numberHandler} />
-      </div>
-      <div>
-        <button type="submit">add</button>
-      </div>
-    </form>
-  )
-}
-const Persons = ({ personArray, filter }) => {
-  return personArray.filter(person => person.name.includes(filter)).map(person => (<h4 key={person.name}>{person.name} {person.number}</h4>))
-}
+import { useEffect, useState } from "react";
+import Filter from "./components/Filter";
+import Form from "./components/Form";
+import Persons from "./components/Persons";
+import serverService from "./services/AxiosRequestServices";
+import handlersFactory from "./services/Handlers";
 
 const App = () => {
-  const [persons, setPersons] = useState([])
-  const [newName, setNewName] = useState('')
-  const [newNum, setNewNum] = useState('')
-  const [filter, setFilter] = useState('')
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    if (Object.values(persons).map(person => person.name).includes(newName)) {
-      alert(`${newName} is already added to phonebook`)
-    }
-    else {
-      setPersons(persons.concat({ 'name': newName, 'number': newNum }))
-      setNewName('')
-      setNewNum('')
-    }
-  }
-  const handleNameChange = (e) => {
-    setNewName(e.target.value)
-  }
-  const handleNumChange = (e) => {
-    setNewNum(e.target.value)
-  }
-  const handleFilterChange = (e) => {
-    setFilter(e.target.value)
-  }
+  const [personsArray, setPersonsArray] = useState([]);
+  const [newPersonName, setNewPersonName] = useState("");
+  const [newPersonNum, setNewPersonNum] = useState("");
+  const [filter, setFilter] = useState("");
+
+  const handlers = handlersFactory(
+    personsArray,
+    setPersonsArray,
+    newPersonName,
+    setNewPersonName,
+    newPersonNum,
+    setNewPersonNum,
+    serverService,
+    setFilter
+  );
 
   useEffect(() => {
-    axios.get('http://localhost:4000/persons')
-      .then(res => {
-        setPersons(res.data)
-      })
-  }, [])
+    const asyncGetPersons = async () => {
+      return await serverService
+        .getPersons()
+        .then((data) => setPersonsArray(data));
+    };
+    asyncGetPersons();
+  }, []);
 
   return (
-    <div>
+    <>
       <h2>Phonebook</h2>
       <div>
         <h3>Filter:</h3>
-        <Filter value={filter} changeHandler={handleFilterChange} />
+        <Filter value={filter} changeHandler={handlers.handleFilterChange} />
       </div>
       <br />
-      <Form name={newName} number={newNum} nameHandler={handleNameChange} numberHandler={handleNumChange} submitHandler={handleSubmit} />
+      <Form
+        name={newPersonName}
+        number={newPersonNum}
+        nameHandler={handlers.handleNameChange}
+        numberHandler={handlers.handleNumChange}
+        submitHandler={handlers.handleSubmit}
+      />
       <h2>Numbers</h2>
-      <Persons personArray={persons} filter={filter} />
-    </div>
-  )
-}
+      <Persons
+        setPersonArray={setPersonsArray}
+        personArray={personsArray}
+        filter={filter}
+        handleDelete={handlers.handlePersonDelete}
+      />
+    </>
+  );
+};
 
-export default App
+export default App;
