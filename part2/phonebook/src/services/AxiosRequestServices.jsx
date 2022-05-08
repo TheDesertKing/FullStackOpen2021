@@ -11,18 +11,16 @@ const getPersons = () => {
   /* getting the persons array from the server 
   @returns {array} personArray - array of persons objects:
     {name: String, number: String, id: Number}
-  @returns null
   */
   const request = axios.get(serverUrl);
-  // console.log(request); //TODO - remove test
   return retPersons(request);
 };
 
 const updatePerson = async (person, newNumber) => {
-  /* updating a person info on server by ID 
-  @param {object} person - person info to update in format:
+  /* updating a person's contact info on server by ID 
+  @param {object} person - person's contact info to update:
     {name: String, number: String, id: Number}
-  @returns {array} personArray - updated array of persons from server:
+  @returns {array} personArray - updated persons array from server:
     {name: String, number: String, id: Number}
   */
   person.number = newNumber;
@@ -34,12 +32,11 @@ const updatePerson = async (person, newNumber) => {
 
 const createPerson = async (person) => {
   /* inserting new person into persons array on server 
-  @param {object} person - person info to insert to server in format:
+  @param {object} person - person contact info:
     {name: String, number: String, id: Number}
-  @returns {array} personArray - updated array of persons from server:
+  @returns {array} personArray - updated persons array from server:
     {name: String, number: String, id: Number}
   */
-  // const personsArray = axios.post(serverUrl, person).then(() => getPersons());
   await axios.post(serverUrl, person);
   const personsArray = await getPersons();
   return personsArray;
@@ -47,21 +44,23 @@ const createPerson = async (person) => {
 
 const removePerson = async (personID) => {
   /* removing person by id from persons array on server 
-  @param {number} personID - ID of person to remove from persons array on server
-  @returns {array} personArray - updated array of persons from server:
+  @param {number} personID - the person's ID
+  @returns {array || bool} personArray - updated array of persons from server:
     {name: String, number: String, id: Number}
+    OR false in case no person with personID exists on server
   */
   const personEntryUrl = `${serverUrl}/${personID}`;
-  let persons;
+  let isSuccessful;
 
-  await axios
+  isSuccessful = await axios
     .delete(personEntryUrl)
-    .catch((reason) =>
-      console.log(
-        `coulden't delete person with ID: ${personID}. perhaps he doesn't exist anymore? reason: ${reason}`
-      )
-    );
-  persons = await getPersons();
+    .then(() => true)
+    .catch(() => false);
+
+  if (!isSuccessful) {
+    return isSuccessful;
+  }
+  const persons = await getPersons();
   return persons;
 };
 

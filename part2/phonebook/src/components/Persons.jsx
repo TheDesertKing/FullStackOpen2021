@@ -5,13 +5,13 @@ const Persons = ({ personArray, filter, handleDelete }) => {
       <div key={person.name + " div"}>
         <h4 key={person.name}>
           {person.name} {person.number}
+          <button
+            onClick={() => handleDelete(person.name, person.id)}
+            key={person.name + "button"}
+          >
+            delete contact
+          </button>
         </h4>
-        <button
-          onClick={() => handleDelete(person.name, person.id)}
-          key={person.name + "button"}
-        >
-          delete contact
-        </button>
       </div>
     ));
 };

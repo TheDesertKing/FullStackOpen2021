@@ -10,13 +10,23 @@ const handlersFactory = (
   newPersonNum,
   setNewPersonNum,
   serverService,
-  setFilter
+  setFilter,
+  setNotifMessage
 ) => {
   const updatePersonsArray = (newPersonsArray) => {
+    /* updates the personsArray state to newPersonsArray 
+    @param {array} newPersonsArray - persons array for PersonsArray state:
+      {name: String, number: String, id: Number}
+    @returns null
+    */
     setPersonsArray(newPersonsArray);
   };
 
   const handleSubmit = (e) => {
+    /* handles submit of new contact to phonebook 
+    @param {object} e - submitEvent of the submiting form
+    @returns null
+    */
     e.preventDefault();
 
     if (newPersonName === "" || newPersonNum === "") {
@@ -27,19 +37,33 @@ const handlersFactory = (
           `${newPersonName} is already added to the phonebook, \ndo you want to change their number?`
         )
       ) {
-        // const personToUpdate = { name: newPersonName, number: newPersonNum,id: id };
+        // update a person's contact information in the phonebook
         const personToUpdate = personsArray.filter(
           (person) => person.name === newPersonName
         )[0];
         serverService
           .updatePerson(personToUpdate, newPersonNum)
-          .then((newPersonsArray) => updatePersonsArray(newPersonsArray));
+          .then((newPersonsArray) => updatePersonsArray(newPersonsArray))
+          .then(() =>
+            setNotifMessage({
+              message: `${personToUpdate.name}'s number has been updated!`,
+              isError: false,
+            })
+          );
       }
-    } else {
+    }
+    // add a person's contact information to the phonebook
+    else {
       const newPerson = { name: newPersonName, number: newPersonNum };
       serverService
         .createPerson(newPerson)
-        .then((newPersonsArray) => updatePersonsArray(newPersonsArray));
+        .then((newPersonsArray) => updatePersonsArray(newPersonsArray))
+        .then(() =>
+          setNotifMessage({
+            message: `${newPerson.name}'s number has been added to the phonebook!`,
+            isError: false,
+          })
+        );
       setNewPersonName("");
       setNewPersonNum("");
     }
@@ -56,14 +80,25 @@ const handlersFactory = (
   };
 
   const handlePersonDelete = async (personName, personID) => {
-    let failed = 0;
+    /* removes a person's contact information from the phonebook
+    @param {string} personName - the person's name
+    @param {number} personID - the person's ID
+    @returns null
+    */
     if (window.confirm(`Are you sure you want to delete ${personName}?`)) {
-      // res = serverService.removePerson(personID).then((res) => console.log(res));
       const newPersonsArray = await serverService.removePerson(personID);
-      setPersonsArray(newPersonsArray);
-    }
-    if (failed) {
-      console.log("operation delete failed");
+      if (newPersonsArray === false) {
+        setNotifMessage({
+          message: `coulden't remove ${personName}, he doesn't exist in the phonebook!`,
+          isError: true,
+        });
+      } else {
+        setNotifMessage({
+          message: `successfully removed ${personName} from the phonebook!`,
+          isError: false,
+        });
+        setPersonsArray(newPersonsArray);
+      }
     }
   };
 

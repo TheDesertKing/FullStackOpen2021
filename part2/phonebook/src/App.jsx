@@ -4,12 +4,18 @@ import Form from "./components/Form";
 import Persons from "./components/Persons";
 import serverService from "./services/AxiosRequestServices";
 import handlersFactory from "./services/Handlers";
+import Notification from "./components/Notification";
+import "./App.css";
 
 const App = () => {
   const [personsArray, setPersonsArray] = useState([]);
   const [newPersonName, setNewPersonName] = useState("");
   const [newPersonNum, setNewPersonNum] = useState("");
   const [filter, setFilter] = useState("");
+  const [notifMessage, setNotifMessage] = useState({
+    message: "",
+    isError: true,
+  });
 
   const handlers = handlersFactory(
     personsArray,
@@ -19,21 +25,26 @@ const App = () => {
     newPersonNum,
     setNewPersonNum,
     serverService,
-    setFilter
+    setFilter,
+    setNotifMessage
   );
 
   useEffect(() => {
-    const asyncGetPersons = async () => {
+    const initialGetPersons = async () => {
       return await serverService
         .getPersons()
         .then((data) => setPersonsArray(data));
     };
-    asyncGetPersons();
+    initialGetPersons();
   }, []);
 
   return (
     <>
       <h2>Phonebook</h2>
+      <Notification
+        message={notifMessage["message"]}
+        isError={notifMessage["isError"]}
+      />
       <div>
         <h3>Filter:</h3>
         <Filter value={filter} changeHandler={handlers.handleFilterChange} />

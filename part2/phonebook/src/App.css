@@ -1,0 +1,23 @@
+.notification-success{
+    display: inline-block;
+    border: 5px solid red;
+    border-radius: 10px;
+    margin: 0,1rem;
+    font-size: 2.5rem;
+    padding: 1.2rem;
+    color: #84ff1f;
+    border-color: aquamarine;
+    background-color: cadetblue;
+}
+
+.notification-failure {
+    display: inline-block;
+    border: 5px solid red;
+    border-radius: 10px;
+    margin: 0,1rem;
+    font-size: 2.5rem;
+    padding: 1.2rem;
+    color: darkred;
+    border-color: crimson;
+    background-color: chocolate;
+}
