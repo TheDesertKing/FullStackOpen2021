@@ -4,9 +4,12 @@ const app = express();
 const PORT = 4000;
 
 app.use(express.json());
-console.log("%cindex.js line:7 morgan", "color: #007acc;", morgan("tiny"));
-
-// app.use(morgan("tiny"));
+morgan.token("postParams", (req, res) => JSON.stringify(req.body));
+app.use(
+  morgan(
+    ":method :url :status :res[content-length] - :response-time ms :postParams"
+  )
+); // used for logging the HTTP requests.
 
 const phonebook = [
   {
@@ -77,11 +80,11 @@ app.delete("/api/persons/:id", (request, response) => {
   }
 });
 
-app.get("/api/persons/", (request, response) => {
+app.get("/api/persons/", (request_unused, response) => {
   response.json(phonebook);
 });
 
-app.get("/info", (request, response) => {
+app.get("/info", (request_unused, response) => {
   const numberOfContacts = phonebook.length;
   const currentDate = new Date().toString();
   const contantCountHTML = `<h3>phonebook has info for
