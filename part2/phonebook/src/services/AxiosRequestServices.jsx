@@ -20,6 +20,7 @@ const updatePerson = async (person, newNumber) => {
   /* updating a person's contact info on server by ID 
   @param {object} person - person's contact info to update:
     {name: String, number: String, id: Number}
+  @param {string} newNumber - the new number
   @returns {array} personArray - updated persons array from server:
     {name: String, number: String, id: Number}
   */

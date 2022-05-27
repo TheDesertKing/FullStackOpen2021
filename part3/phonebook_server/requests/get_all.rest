@@ -1,0 +1,17 @@
+DELETE http://localhost:4000/api/persons/1
+###
+GET http://localhost:4000/api/persons/1
+###
+GET http://localhost:4000/api/persons
+###
+POST http://localhost:4000/api/persons 
+Content-Type: application/json
+
+{
+  "number":"123123"
+}
+
+
+# GET http://localhost:4000/info
+
+# GET http://localhost:4000/
